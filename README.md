@@ -1,2 +1,3 @@
 # redis_channel
-remote_channel using gnet, just for fun
+
+以channel形式与远端通信,just for fun
