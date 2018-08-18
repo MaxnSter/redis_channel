@@ -1,0 +1,139 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "ncWKx0dI/jogs1YL/3NFO4FMdmE=",
+			"path": "github.com/MaxnSter/GolangDataStructure/leetcode/queue",
+			"revision": "b0c98b70ccafe9f88dc2e187fc78d55e14ac390c",
+			"revisionTime": "2018-08-04T07:45:56Z"
+		},
+		{
+			"checksumSHA1": "Vo8qwbarGVzA5+QwSRe74PBeeK0=",
+			"path": "github.com/MaxnSter/gnet",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "kBlzbH2lEM7gPgPv+uDF19nhrcs=",
+			"path": "github.com/MaxnSter/gnet/codec",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "0FCKxy+aTbKXv6cZi2uZ1jBJiWM=",
+			"path": "github.com/MaxnSter/gnet/codec/codec_msgpack",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "U2O8grkCl7FIea5dQpOXe4VCPQo=",
+			"path": "github.com/MaxnSter/gnet/iface",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "L29kEitojPCzQr/o2SuXCZCgprA=",
+			"path": "github.com/MaxnSter/gnet/logger",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "Ohij1XgaiYHJeRgB64/hhOsI/qU=",
+			"path": "github.com/MaxnSter/gnet/message_pack",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "VHPXronCscKTJC3JLI4hzuN3S2Q=",
+			"path": "github.com/MaxnSter/gnet/message_pack/message_meta",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "OnAvUztIAMba9LQRaigMSlbUQ68=",
+			"path": "github.com/MaxnSter/gnet/message_pack/pack/pack_type_length_value",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "4qV9RWAAglky4fGhLCvcmYKzeXA=",
+			"path": "github.com/MaxnSter/gnet/net/tcp",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "Ha5wZ3aFM7UBDg06h74lh8jiw8M=",
+			"path": "github.com/MaxnSter/gnet/plugin",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "tHNeJvep57JpQ+sLcVBMjnpT6iE=",
+			"path": "github.com/MaxnSter/gnet/timer",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "neUvwrTfg0thvPUJ6BFRnE4TLPw=",
+			"path": "github.com/MaxnSter/gnet/util",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "0XJ85mru30ApZpkn6qYZm3CtUlM=",
+			"path": "github.com/MaxnSter/gnet/worker_pool",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "j6S43SNU/mrXW3YyIN5HQAsn1mE=",
+			"path": "github.com/MaxnSter/gnet/worker_pool/internal/basic_event_queue",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "GD7LWU3P6VbZlWK8jq8EdVAxSB4=",
+			"path": "github.com/MaxnSter/gnet/worker_pool/worker_session_race_other",
+			"revision": "d2b21b28a39e7658477ee2d1b71ef718bcaa131a",
+			"revisionTime": "2018-08-05T07:29:25Z"
+		},
+		{
+			"checksumSHA1": "IU0RLDrXScjlsTwNWAKQLLsLoc0=",
+			"path": "github.com/sirupsen/logrus",
+			"revision": "92052687f8ec598ff0da626d2909478cfd1e3a3c",
+			"revisionTime": "2018-07-12T20:16:18Z"
+		},
+		{
+			"checksumSHA1": "x/CtdzUBgACa5QF3qq8vdLDW41o=",
+			"path": "github.com/vmihailenco/msgpack",
+			"revision": "b5e691b1eb52a28c05e67ab9df303626c095c23b",
+			"revisionTime": "2018-06-13T09:15:15Z"
+		},
+		{
+			"checksumSHA1": "OcTSGT2v7/2saIGq06nDhEZwm8I=",
+			"path": "github.com/vmihailenco/msgpack/codes",
+			"revision": "b5e691b1eb52a28c05e67ab9df303626c095c23b",
+			"revisionTime": "2018-06-13T09:15:15Z"
+		},
+		{
+			"checksumSHA1": "BGm8lKZmvJbf/YOJLeL1rw2WVjA=",
+			"path": "golang.org/x/crypto/ssh/terminal",
+			"revision": "c126467f60eb25f8f27e5a981f32a87e3965053f",
+			"revisionTime": "2018-07-23T15:26:11Z"
+		},
+		{
+			"checksumSHA1": "PqZlazU/dKCEc8I353TYnUJNobw=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "e072cadbbdc8dd3d3ffa82b8b4b9304c261d9311",
+			"revisionTime": "2018-07-24T16:28:38Z"
+		},
+		{
+			"checksumSHA1": "P8Y8GFwxybTfltfh8Q0lHqlEYIM=",
+			"path": "golang.org/x/sys/windows",
+			"revision": "e072cadbbdc8dd3d3ffa82b8b4b9304c261d9311",
+			"revisionTime": "2018-07-24T16:28:38Z"
+		}
+	],
+	"rootPath": "github.com/MaxnSter/redis_channel"
+}
