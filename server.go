@@ -1,4 +1,4 @@
-package redis_channel_server
+package server
 
 import (
 	"github.com/MaxnSter/GolangDataStructure/leetcode/queue"
@@ -16,7 +16,7 @@ import (
 	_ "github.com/MaxnSter/gnet/net/tcp"
 	"github.com/MaxnSter/gnet/worker_pool"
 	_ "github.com/MaxnSter/gnet/worker_pool/worker_session_race_other"
-	cmd "github.com/MaxnSter/redis_channel"
+	cmd "github.com/MaxnSter/remote_channel"
 )
 
 type sndWaitEntry struct {
@@ -109,12 +109,12 @@ func (s *channelServer) in(msg *cmd.Proto, session gnet.NetSession) {
 				continue
 			} else {
 				logger.Debugln("rcvWaiter online, sid:", sID)
-				// 唤醒阻塞中的接受者
+				// 唤醒阻塞中的接受者, directly send msg.data
 				msg.Cmd = cmd.CMD_RCV_WAKEUP
 				sWait.Send(msg)
 
 				session.Send(&cmd.Proto{
-					Cmd:  cmd.CMD_OK,
+					Cmd:  cmd.CMD_SND_OK,
 					Name: msg.Name,
 				})
 				return
@@ -129,7 +129,7 @@ func (s *channelServer) in(msg *cmd.Proto, session gnet.NetSession) {
 		})
 
 		session.Send(&cmd.Proto{
-			Cmd:  cmd.CMD_BLOCK,
+			Cmd:  cmd.CMD_SND_BLOCK,
 			Name: msg.Name,
 		})
 		return
@@ -137,7 +137,7 @@ func (s *channelServer) in(msg *cmd.Proto, session gnet.NetSession) {
 
 	ch.buf.PushBack(msg.Data)
 	session.Send(&cmd.Proto{
-		Cmd:  cmd.CMD_OK,
+		Cmd:  cmd.CMD_SND_OK,
 		Name: msg.Name,
 	})
 }
@@ -148,7 +148,7 @@ func (s *channelServer) outSync(ch *remoteCh, msg *cmd.Proto, session gnet.NetSe
 		ch.sndWaitList.PopFront()
 
 		msg.Data = sndWaitBuf.data
-		msg.Cmd = cmd.CMD_OK
+		msg.Cmd = cmd.CMD_RCV_OK
 		session.Send(msg)
 
 		// 唤醒发送者
@@ -160,7 +160,7 @@ func (s *channelServer) outSync(ch *remoteCh, msg *cmd.Proto, session gnet.NetSe
 		}
 	} else {
 		ch.rcvWaitList.PushBack(session.ID())
-		msg.Cmd = cmd.CMD_BLOCK
+		msg.Cmd = cmd.CMD_RCV_BLOCK
 		session.Send(msg)
 	}
 }
@@ -187,7 +187,7 @@ func (s *channelServer) out(msg *cmd.Proto, session gnet.NetSession) {
 	if ch.buf.Size() <= 0 {
 		ch.rcvWaitList.PushBack(session.ID())
 		session.Send(&cmd.Proto{
-			Cmd:  cmd.CMD_BLOCK,
+			Cmd:  cmd.CMD_RCV_BLOCK,
 			Name: msg.Name,
 		})
 		return
@@ -198,7 +198,7 @@ func (s *channelServer) out(msg *cmd.Proto, session gnet.NetSession) {
 	ch.buf.PopFront()
 
 	msg.Data = data
-	msg.Cmd = cmd.CMD_OK
+	msg.Cmd = cmd.CMD_RCV_OK
 	session.Send(msg)
 
 	// 唤醒待发送队列中的sender
@@ -235,13 +235,15 @@ func (s *channelServer) newOrCreate(msg *cmd.Proto, session gnet.NetSession) {
 		}
 	}
 
-	msg.Cmd = cmd.CMD_OK
+	msg.Cmd = cmd.CMD_CREATE_OK
 	session.Send(msg)
 }
 
 func (s *channelServer) close(msg *cmd.Proto, session gnet.NetSession) {
 	var ch *remoteCh
 	var hit bool
+
+	logger.Debugln("closing every one!!!")
 
 	if ch, hit = s.buffers[msg.Name]; !hit {
 		msg.Cmd = cmd.CMD_ERRNOTFOUND
@@ -251,6 +253,8 @@ func (s *channelServer) close(msg *cmd.Proto, session gnet.NetSession) {
 
 	delete(s.buffers, msg.Name)
 	for ch.sndWaitList.Size() > 0 {
+		logger.Debugln("closing sender")
+
 		sid := ch.sndWaitList.Peek().(*sndWaitEntry).id
 		ch.sndWaitList.PopFront()
 
@@ -263,6 +267,8 @@ func (s *channelServer) close(msg *cmd.Proto, session gnet.NetSession) {
 	}
 
 	for ch.rcvWaitList.Size() > 0 {
+		logger.Debugln("closing waiter")
+
 		rid := ch.rcvWaitList.Peek().(int64)
 		ch.rcvWaitList.PopFront()
 
