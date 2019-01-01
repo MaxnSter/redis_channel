@@ -1,6 +1,7 @@
-package client
+package remote_channel
 
 import (
+	"github.com/MaxnSter/remote_channel/cmd"
 	"reflect"
 	"sync"
 
@@ -22,7 +23,7 @@ func init() {
 	coder = codec.MustGetCoder("msgpack")
 }
 
-type handler func(channel *remoteChannel, msg *Proto)
+type handler func(channel *remoteChannel, msg *cmd.Proto)
 
 type remoteChannel struct {
 	cap  int
@@ -42,43 +43,43 @@ type remoteChannel struct {
 	sndReady  chan struct{}
 	rcvReady  chan struct{}
 	sndDone   chan struct{}
-	rcvDone   chan *Proto
+	rcvDone   chan *cmd.Proto
 
-	cmdReactors map[Command]handler
+	cmdReactors map[cmd.Command]handler
 }
 
 func (ch *remoteChannel) registerHandler() {
-	ch.cmdReactors[CMD_CREATE_OK] = func(channel *remoteChannel, msg *Proto) {
+	ch.cmdReactors[cmd.CMD_CREATE_OK] = func(channel *remoteChannel, msg *cmd.Proto) {
 		channel.onCreateOk(msg)
 	}
-	ch.cmdReactors[CMD_SND_OK] = func(channel *remoteChannel, msg *Proto) {
+	ch.cmdReactors[cmd.CMD_SND_OK] = func(channel *remoteChannel, msg *cmd.Proto) {
 		channel.onSndOk(msg)
 	}
-	ch.cmdReactors[CMD_RCV_OK] = func(channel *remoteChannel, msg *Proto) {
+	ch.cmdReactors[cmd.CMD_RCV_OK] = func(channel *remoteChannel, msg *cmd.Proto) {
 		channel.onRcvOk(msg)
 	}
-	ch.cmdReactors[CMD_SND_BLOCK] = func(channel *remoteChannel, msg *Proto) {
+	ch.cmdReactors[cmd.CMD_SND_BLOCK] = func(channel *remoteChannel, msg *cmd.Proto) {
 		channel.onSndBlock(msg)
 	}
-	ch.cmdReactors[CMD_RCV_BLOCK] = func(channel *remoteChannel, msg *Proto) {
+	ch.cmdReactors[cmd.CMD_RCV_BLOCK] = func(channel *remoteChannel, msg *cmd.Proto) {
 		channel.onRcvBlock(msg)
 	}
-	ch.cmdReactors[CMD_CLOSED] = func(channel *remoteChannel, msg *Proto) {
+	ch.cmdReactors[cmd.CMD_CLOSED] = func(channel *remoteChannel, msg *cmd.Proto) {
 		channel.onChClosed(msg)
 	}
-	ch.cmdReactors[CMD_SND_WAKEUP] = func(channel *remoteChannel, msg *Proto) {
+	ch.cmdReactors[cmd.CMD_SND_WAKEUP] = func(channel *remoteChannel, msg *cmd.Proto) {
 		channel.onChSndWakeUp(msg)
 	}
-	ch.cmdReactors[CMD_RCV_WAKEUP] = func(channel *remoteChannel, msg *Proto) {
+	ch.cmdReactors[cmd.CMD_RCV_WAKEUP] = func(channel *remoteChannel, msg *cmd.Proto) {
 		channel.onChRcvWakeUp(msg)
 	}
 
 	// error handing
-	ch.cmdReactors[CMD_ERRCMD] = func(channel *remoteChannel, msg *Proto) {
+	ch.cmdReactors[cmd.CMD_ERRCMD] = func(channel *remoteChannel, msg *cmd.Proto) {
 		logger.Errorf("error occur, cmd:%d, ch:%s", msg.Cmd, msg.Name)
 	}
-	ch.cmdReactors[CMD_ERRNOTFOUND] = ch.cmdReactors[CMD_ERRCMD]
-	ch.cmdReactors[CMD_ERRPROTO] = ch.cmdReactors[CMD_ERRCMD]
+	ch.cmdReactors[cmd.CMD_ERRNOTFOUND] = ch.cmdReactors[cmd.CMD_ERRCMD]
+	ch.cmdReactors[cmd.CMD_ERRPROTO] = ch.cmdReactors[cmd.CMD_ERRCMD]
 }
 
 func (ch *remoteChannel) makeHandler() {
@@ -97,11 +98,11 @@ func NewRemoteChannel(name string, dataType reflect.Type, cap int) *remoteChanne
 		meta:        message_meta.NewMessageMeta(0, dataType),
 		connected:   make(chan struct{}),
 		sndDone:     make(chan struct{}),
-		rcvDone:     make(chan *Proto),
+		rcvDone:     make(chan *cmd.Proto),
 		sndReady:    make(chan struct{}, 1),
 		rcvReady:    make(chan struct{}, 1),
 		l:           sync.Mutex{},
-		cmdReactors: map[Command]handler{},
+		cmdReactors: map[cmd.Command]handler{},
 	}
 
 	r.registerHandler()
@@ -131,8 +132,8 @@ func (ch *remoteChannel) Close() {
 		return
 	}
 
-	ch.netSession.Send(&Proto{
-		Cmd:  CMD_CLOSE,
+	ch.netSession.Send(&cmd.Proto{
+		Cmd:  cmd.CMD_CLOSE,
 		Name: ch.name,
 	})
 }
@@ -155,8 +156,8 @@ func (ch *remoteChannel) In(data interface{}) {
 	ch.sndReady <- struct{}{}
 	ch.sndStatus = NET_IN
 	ch.l.Unlock()
-	ch.netSession.Send(&Proto{
-		Cmd:  CMD_IN,
+	ch.netSession.Send(&cmd.Proto{
+		Cmd:  cmd.CMD_IN,
 		Name: ch.name,
 		Data: dataEncoded,
 	})
@@ -176,13 +177,13 @@ func (ch *remoteChannel) Out() (data interface{}, ok bool) {
 	ch.rcvReady <- struct{}{}
 	ch.rcvStatus = NET_OUT
 	ch.l.Unlock()
-	ch.netSession.Send(&Proto{
-		Cmd:  CMD_OUT,
+	ch.netSession.Send(&cmd.Proto{
+		Cmd:  cmd.CMD_OUT,
 		Name: ch.name,
 	})
 
 	msg := <-ch.rcvDone
-	if msg.Cmd == CMD_RCV_OK || msg.Cmd == CMD_RCV_WAKEUP {
+	if msg.Cmd == cmd.CMD_RCV_OK || msg.Cmd == cmd.CMD_RCV_WAKEUP {
 		newType := ch.meta.NewType()
 		if err := coder.Decode(msg.Data, newType); err != nil {
 			logger.Errorln("decode data error")
@@ -198,7 +199,7 @@ func (ch *remoteChannel) Out() (data interface{}, ok bool) {
 }
 
 func (ch *remoteChannel) onMessage(ev gnet.Event) {
-	msg, ok := ev.Message().(*Proto)
+	msg, ok := ev.Message().(*cmd.Proto)
 	if !ok {
 		logger.Errorln("msg type assert error")
 		return
@@ -213,7 +214,7 @@ func (ch *remoteChannel) onMessage(ev gnet.Event) {
 }
 
 // FIXME after ch closed
-func (ch *remoteChannel) onCreateOk(msg *Proto) {
+func (ch *remoteChannel) onCreateOk(msg *cmd.Proto) {
 	ch.l.Lock()
 	defer ch.l.Unlock()
 
@@ -222,7 +223,7 @@ func (ch *remoteChannel) onCreateOk(msg *Proto) {
 }
 
 // FIXME after ch closed
-func (ch *remoteChannel) onSndOk(msg *Proto) {
+func (ch *remoteChannel) onSndOk(msg *cmd.Proto) {
 	ch.l.Lock()
 	defer ch.l.Unlock()
 
@@ -231,7 +232,7 @@ func (ch *remoteChannel) onSndOk(msg *Proto) {
 }
 
 // FIXME after ch closed
-func (ch *remoteChannel) onSndBlock(msg *Proto) {
+func (ch *remoteChannel) onSndBlock(msg *cmd.Proto) {
 	ch.l.Lock()
 	defer ch.l.Unlock()
 
@@ -239,7 +240,7 @@ func (ch *remoteChannel) onSndBlock(msg *Proto) {
 }
 
 // FIXME after ch closed
-func (ch *remoteChannel) onRcvOk(msg *Proto) {
+func (ch *remoteChannel) onRcvOk(msg *cmd.Proto) {
 	ch.l.Lock()
 	defer ch.l.Unlock()
 
@@ -248,14 +249,14 @@ func (ch *remoteChannel) onRcvOk(msg *Proto) {
 }
 
 // FIXME after ch closed
-func (ch *remoteChannel) onRcvBlock(msg *Proto) {
+func (ch *remoteChannel) onRcvBlock(msg *cmd.Proto) {
 	ch.l.Lock()
 	defer ch.l.Unlock()
 
 	ch.rcvStatus = BLOCK_OUT
 }
 
-func (ch *remoteChannel) onChClosed(msg *Proto) {
+func (ch *remoteChannel) onChClosed(msg *cmd.Proto) {
 	ch.l.Lock()
 	defer func() {
 		ch.status = CLOSED
@@ -273,11 +274,11 @@ func (ch *remoteChannel) onChClosed(msg *Proto) {
 	}
 }
 
-func (ch *remoteChannel) onChSndWakeUp(msg *Proto) {
+func (ch *remoteChannel) onChSndWakeUp(msg *cmd.Proto) {
 	ch.sndDone <- struct{}{}
 }
 
-func (ch *remoteChannel) onChRcvWakeUp(msg *Proto) {
+func (ch *remoteChannel) onChRcvWakeUp(msg *cmd.Proto) {
 	ch.rcvDone <- msg
 }
 
@@ -285,8 +286,8 @@ func (ch *remoteChannel) onConnected(s gnet.NetSession) {
 	ch.netSession = s
 	ch.status = NET_CREATE
 
-	ch.netSession.Send(&Proto{
-		Cmd:  CMD_NEWORCREAT,
+	ch.netSession.Send(&cmd.Proto{
+		Cmd:  cmd.CMD_NEWORCREAT,
 		Name: ch.name,
 		Data: []byte(strconv.Itoa(ch.cap)),
 	})

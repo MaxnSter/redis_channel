@@ -1,4 +1,4 @@
-package server
+package remote_channel
 
 import (
 	"github.com/MaxnSter/GolangDataStructure/leetcode/queue"
@@ -16,7 +16,7 @@ import (
 	_ "github.com/MaxnSter/gnet/net/tcp"
 	"github.com/MaxnSter/gnet/worker_pool"
 	_ "github.com/MaxnSter/gnet/worker_pool/worker_session_race_other"
-	cmd "github.com/MaxnSter/remote_channel"
+	"github.com/MaxnSter/remote_channel/cmd"
 )
 
 type sndWaitEntry struct {

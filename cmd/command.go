@@ -1,4 +1,4 @@
-package remote_channel
+package cmd
 
 import (
 	"github.com/MaxnSter/gnet/message_pack/message_meta"

@@ -1,3 +1,3 @@
-# redis_channel
+# remote_chanel
 
-以channel形式与远端通信,just for fun
+
